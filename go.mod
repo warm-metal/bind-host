@@ -26,6 +26,7 @@ require (
 	github.com/containerd/typeurl v1.0.1 // indirect
 	github.com/containernetworking/plugins v0.8.6 // indirect
 	github.com/containers/ocicrypt v1.1.0 // indirect
+	github.com/d-tux/go-fstab v0.0.0-20141204152952-eb4090f26517 // indirect
 	github.com/denverdino/aliyungo v0.0.0-20190125010748-a747050bb1ba // indirect
 	github.com/dnaeon/go-vcr v1.0.1 // indirect
 	github.com/docker/distribution v2.7.1+incompatible // indirect
