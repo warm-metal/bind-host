@@ -14,6 +14,7 @@ It is now used in our project [csi-driver-image](https://github.com/warm-metal/c
 
 ## Usage
 
+### Start the binary
 ```shell script
 Usage of _output/bind-host:
   -cri-image string
@@ -24,4 +25,8 @@ Usage of _output/bind-host:
     	Path of the mounted host rootfs. It should be absolute. (default "/host")
 ```
 
-Users can also use our Dockerfile as one of your build stage and copy the binary to their images.
+### Embed the Dockerfile
+Users can also use our `Dockerfile.embeded` as one of your build stage and copy the binary to their images.
+
+### Copy the binary from out image
+User can use our published image `docker.io/warmmetal/bind-host:latest` as the based image of one stage.

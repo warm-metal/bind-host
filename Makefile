@@ -5,3 +5,7 @@ all:
 .PHONY: in image
 in image:
 	kubectl dev build --local _output/
+
+.PHONY: image
+image:
+	kubectl dev build -t docker.io/warmmetal/bind-host:latest
