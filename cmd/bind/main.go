@@ -25,7 +25,7 @@ func init() {
 			"retrieved via the CRI image service, then mounted to the local filesystem.",
 	)
 	flag.StringVar(&fstabPath, "fstab", "",
-		"Path of a file in the style of fstab(5). It should be absolute. Entries in the file will be mounted to"+
+		"Path of a file in the style of fstab(5). It should be absolute. Entries in the file will be mounted to "+
 			"the local filesystem.",
 	)
 }
@@ -58,6 +58,15 @@ func main() {
 		volumes = append(volumes, vs...)
 	}
 
+	defer func() {
+		for i := len(volumes) - 1; i >= 0; i-- {
+			v := volumes[i]
+			if err := mounter.Unmount(v.Target); err != nil {
+				fmt.Fprintln(os.Stderr, "unable to unmount %q: %s", v.Target, err)
+			}
+		}
+	}()
+
 	for _, v := range volumes {
 		if err := mounter.Mount(filepath.Join(rootfs, v.Source), v.Target, v.FsType, v.Options); err != nil {
 			panic(fmt.Sprintf("unable to mount volume %q: %s", v, err))
@@ -80,11 +89,11 @@ func main() {
 }
 
 func printUsage() {
-	fmt.Print(`bind-host [Flags] [command args]
+	fmt.Print(`bind-host [Flags] -- [command args]
 
 bind-host mounts directories or files from the path given via -rootfs to the local rootfs. If command and args are given,
 the command will be executed after all volumes mounted. Or, bind-host will exit.
-Flags:
+
 `)
 	flag.CommandLine.Usage()
 }

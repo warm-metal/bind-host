@@ -2,8 +2,8 @@
 all:
 	go build -o _output/bind-host ./cmd/bind
 
-.PHONY: in image
-in image:
+.PHONY: in container
+in container:
 	kubectl dev build --local _output/
 
 .PHONY: image
