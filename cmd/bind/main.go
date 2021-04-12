@@ -12,11 +12,12 @@ import (
 	"os/exec"
 	"os/signal"
 	"path/filepath"
+	"strings"
 	"syscall"
 )
 
 var (
-	rootfs    = "/host"
+	rootfs    = ""
 	criConn   = ""
 	fstabPath = ""
 	verbosity = ""
@@ -24,14 +25,14 @@ var (
 )
 
 func init() {
-	flag.StringVar(&rootfs, "rootfs", rootfs, "Path of the mounted host rootfs. It should be absolute.")
+	flag.StringVar(&rootfs, "rootfs", rootfs, "Path of the mounted host rootfs. It should be absolute. [$HOST_ROOTFS]")
 	flag.StringVar(&criConn, "cri-image", criConn,
 		"CRI image service endpoint. It usually is a UNIX socket URL. The image filesystem mountpoint will be "+
-			"retrieved via the CRI image service, then mounted to the local filesystem.",
+			"retrieved via the CRI image service, then mounted to the local filesystem. [$CRI_ADDR]",
 	)
 	flag.StringVar(&fstabPath, "fstab", "",
 		"Path of a file in the manner of fstab(5). It should be absolute. Entries in the file will be mounted to "+
-			"the local filesystem.",
+			"the local filesystem. [$FSTAB]",
 	)
 	flag.StringVar(&verbosity, "v","", "Number for the log level verbosity. Set to 1 to show debug logs.")
 	flag.BoolVar(&waitSignal, "wait", false,
@@ -41,7 +42,30 @@ func init() {
 
 func main() {
 	flag.CommandLine.Usage = printUsage
-	flag.Parse()
+	flag.CommandLine.Init(os.Args[0], flag.ContinueOnError)
+	if err := flag.CommandLine.Parse(os.Args[1:]); err != nil {
+		if err == flag.ErrHelp {
+			os.Exit(0)
+		}
+
+		fmt.Printf("\ncommand line got: %s\n", strings.Join(os.Args, " "))
+		os.Exit(2)
+	}
+
+	// Parse flags frm envs.
+	envFlags := map[string]*string{
+		"HOST_ROOTFS": &rootfs,
+		"CRI_ADDR": &criConn,
+		"FSTAB": &fstabPath,
+	}
+
+	for k, f := range envFlags {
+		if len(*f) > 0 {
+			continue
+		}
+
+		*f = os.Getenv(k)
+	}
 
 	klogFlags := flag.NewFlagSet("klog", flag.PanicOnError)
 	klog.InitFlags(klogFlags)
@@ -49,10 +73,17 @@ func main() {
 	klogFlags.Set("v", verbosity)
 	klogFlags.Parse(nil)
 
+	defer klog.Flush()
+
 	klog.V(1).Infof("debug logs enabled!")
 
 	if !filepath.IsAbs(rootfs) {
-		printUsage()
+		klog.Fatalf("-rootfs must be absolute but %q", rootfs)
+		return
+	}
+
+	if _, err := os.Lstat(rootfs); err != nil {
+		klog.Fatal(err.Error())
 		return
 	}
 
@@ -180,12 +211,11 @@ func unmount(mounter mount.Interface, volumes []plugin.MountVolume) {
 }
 
 func printUsage() {
-	fmt.Print(`
+	fmt.Fprintln(os.Stderr,`
 bind-host [Flags] -- [command args]
 
-bind-host mounts directories or files from the path given via -rootfs to the local filesystem. If command and args are given, it will be executed after all volumes mounted.
+bind-host mounts directories or files from the path given via -rootfs to the local filesystem. If command and args are given, it will be executed after mounting all volumes.
 
-Flags:
-`)
+Flags:`)
 	flag.PrintDefaults()
 }

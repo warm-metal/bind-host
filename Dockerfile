@@ -9,9 +9,10 @@ COPY pkg ./pkg
 
 RUN CGO_ENABLED=0 go build -o bind-host ./cmd/bind
 
-FROM scratch
-COPY --from=builder /go/src/bind-host/bind-host /
+FROM alpine:3
+WORKDIR /
+COPY --from=builder /go/src/bind-host/bind-host /usr/bin/
 ENV HOST_ROOTFS=""
 ENV CRI_ADDR=""
 ENV FSTAB=""
-ENTRYPOINT ["/bind-host", "-rootfs=${HOST_ROOTFS}", "-cri-image=${CRI_ADDR}", "-fstab=${FSTAB}", "--"]
+ENTRYPOINT ["bind-host", "-v=1", "--"]

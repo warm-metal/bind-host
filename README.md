@@ -39,6 +39,15 @@ echo '/etc/systemd /foo/bar none defaults,rbind' > ./fstab
 bind-host -rootfs=/host -fstab=./fstab -v 1 -wait
 ```
 
+#### Environment Variables
+It is more friendly in container context to use envs. See the table below.
+
+| ENV |Flag|
+|---|---|
+| HOST_ROOTFS | -rootfs |
+| CRI_ADDR | -cri-image |
+| FSTAB | -fstab |
+
 ## Integration
 
 ### Download the binary
@@ -47,7 +56,8 @@ bind-host -rootfs=/host -fstab=./fstab -v 1 -wait
 Users can download prebuilt binaries from the release page.
 
 ### Embed the Dockerfile
-Users can also use our `Dockerfile.embeded` as one of your build stage and copy the binary to their images.
+Users can also use our `Dockerfile.embeded` and replace the last stage with your Dockerfile,
+then copy the binary from the stage `builder`.
 
 ### Copy the binary from our image
-Users can use our published image `docker.io/warmmetal/bind-host:latest` as the based image of one stage.
+Users can use our published image `docker.io/warmmetal/bind-host:latest` as the base image.

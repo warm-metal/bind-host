@@ -1,5 +1,6 @@
 .PHONY: all
 all:
+	go vet ./...
 	go build -o _output/bind-host ./cmd/bind
 
 .PHONY: in container
@@ -8,6 +9,7 @@ in container:
 
 .PHONY: image
 image:
+	kubectl dev build -t docker.io/warmmetal/bind-host:v0.1.0
 	kubectl dev build -t docker.io/warmmetal/bind-host:latest
 
 .PHONY: test
