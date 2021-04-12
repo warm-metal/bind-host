@@ -15,7 +15,11 @@ func GetVolumes(fstabFile string) ([]plugin.MountVolume, error) {
 	for _, m := range mounts {
 		opts := make([]string, 0, len(m.VfsType))
 		for k, v := range m.MntOps {
-			opts = append(opts, k + "="+v)
+			if len(v) > 0 {
+				opts = append(opts, k + "="+v)
+			} else {
+				opts = append(opts, k)
+			}
 		}
 
 		volumes = append(volumes, plugin.MountVolume{

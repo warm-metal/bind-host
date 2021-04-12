@@ -72,6 +72,7 @@ require (
 	gotest.tools/v3 v3.0.3 // indirect
 	k8s.io/apiserver v0.20.1 // indirect
 	k8s.io/cri-api v0.21.0 // indirect
+	k8s.io/klog/v2 v2.8.0 // indirect
 	k8s.io/kubernetes v1.13.0 // indirect
 	k8s.io/utils v0.0.0-20210305010621-2afb4311ab10 // indirect
 )

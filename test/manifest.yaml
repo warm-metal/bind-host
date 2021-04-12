@@ -1,0 +1,35 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: bind-host-test
+spec:
+  template:
+    metadata:
+      name: bind-host-test
+    spec:
+      containers:
+        - name: bind-host-test
+          image: docker.io/warmmetal/bind-host-test:integration
+          env:
+            - name: HOST_ROOTFS
+              value: /host
+            - name: CRI_ADDR
+              value: unix:///run/containerd/containerd.sock
+          volumeMounts:
+            - mountPath: /run/containerd/containerd.sock
+              name: containerd-socket
+            - mountPath: /host
+              name: host
+          securityContext:
+            privileged: true
+      restartPolicy: Never
+      volumes:
+        - name: containerd-socket
+          hostPath:
+            path: /run/containerd/containerd.sock
+            type: Socket
+        - name: host
+          hostPath:
+            path: /
+            type: Directory
+  backoffLimit: 0
