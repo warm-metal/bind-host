@@ -9,8 +9,7 @@ in container:
 
 .PHONY: image
 image:
-	kubectl dev build -t docker.io/warmmetal/bind-host:v0.1.0
-	kubectl dev build -t docker.io/warmmetal/bind-host:latest
+	kubectl dev build -t docker.io/warmmetal/bind-host:v0.2.0 --push
 
 .PHONY: test
 test:
