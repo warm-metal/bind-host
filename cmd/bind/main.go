@@ -90,7 +90,6 @@ func main() {
 	mounter := mount.New("")
 	var volumes []plugin.MountVolume
 	if len(criConn) > 0 {
-		var err error
 		vs, err := cri.GetVolumes(criConn)
 		if err != nil {
 			klog.Fatalf("cri plugin failed: %s", err)
