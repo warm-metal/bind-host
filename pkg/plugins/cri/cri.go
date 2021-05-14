@@ -50,6 +50,11 @@ func GetVolumes(criConn string) ([]plugin.MountVolume, error) {
 			continue
 		}
 
+		if len(vols) == 0 {
+			vols = append(vols, fs.FsId.Mountpoint)
+			continue
+		}
+
 		for i, vol := range vols {
 			if strings.HasPrefix(fs.FsId.Mountpoint, vol) {
 				break
